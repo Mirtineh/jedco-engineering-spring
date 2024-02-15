@@ -19,7 +19,7 @@ public class BoxNumber extends BaseEntity{
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="pole_no_id", nullable=false)
-    private PoleData jdPoleData;
+    private PoleData poleData;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
