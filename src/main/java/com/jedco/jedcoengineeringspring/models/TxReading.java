@@ -19,6 +19,7 @@ public class TxReading extends BaseEntity{
     private Double transformerLoading;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="created_on", nullable=false, length=23)
     private Date createdOn;
 
     @ManyToOne(fetch=FetchType.LAZY)
