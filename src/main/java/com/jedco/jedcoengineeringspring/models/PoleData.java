@@ -75,16 +75,15 @@ public class PoleData extends BaseEntity{
     @Column(name="pole_reg_type", length=100)
     private String poleRegType;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="last_updated_on", nullable=false, length=23)
+    @Column(name="last_updated_by", length=100)
     private String updatedBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="last_updated_on", nullable=false, length=23)
     private Date updatedOn;
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="jdPoleData")
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="poleData")
     private Set<MeterData> meterDataSet = new HashSet<MeterData>(0);
 
-    @OneToMany(fetch=FetchType.EAGER, mappedBy="jdPoleData")
+    @OneToMany(fetch=FetchType.EAGER, mappedBy="poleData")
     private Set<BoxNumber> boxNumbers= new HashSet<>();
 }

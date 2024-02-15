@@ -45,6 +45,7 @@ public class TxInfo extends BaseEntity{
     private Long registeredBy;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="updated_on", nullable=false, length=23)
     private Date updatedOn;
 
     @Column(name="updated_by", precision=53, scale=0)

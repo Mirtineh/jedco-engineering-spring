@@ -25,6 +25,6 @@ public class UserAction extends BaseEntity{
     @Column(name="action_status", nullable=false)
     private long actionStatus;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="jdUserAction")
+    @OneToMany(fetch=FetchType.EAGER, mappedBy="userAction")
     private Set<RoleDefinition> jdRoleDefinitions = new HashSet<>(0);
 }

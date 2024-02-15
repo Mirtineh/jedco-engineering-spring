@@ -19,7 +19,7 @@ public record LvDataResponse(
         String pole_anomaly,
         String northing,
         String easting,
-        List<LvMeterResponse> meterDataDtoList,
-        String poleRegistrationType
+        String poleRegistrationType,
+        List<LvMeterResponse> meterDataDtoList
 ) {
 }
