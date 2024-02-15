@@ -20,7 +20,7 @@ public class User extends BaseEntity{
     @JoinColumn(name="user_status", nullable=false)
     private Status status;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name="user_role", nullable=false)
     private UserRole userRole;
 
@@ -58,6 +58,6 @@ public class User extends BaseEntity{
     @Column(name="activation_index")
     private Long activationIndex;
 
-    @OneToMany(fetch=FetchType.LAZY, mappedBy="jdUsers")
+    @OneToMany(fetch=FetchType.LAZY, mappedBy="registeredBy")
     private Set<PoleData> poleDataSet = new HashSet<>(0);
 }
