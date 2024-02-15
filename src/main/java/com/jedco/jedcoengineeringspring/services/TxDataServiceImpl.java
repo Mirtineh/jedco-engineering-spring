@@ -52,12 +52,12 @@ public class TxDataServiceImpl implements TxDataService {
     }
 
     @Override
-    public void addTxReadingWithLineReadings(Long txReadingId, TxReadingRequest txReadingDTO, Principal principal) {
+    public void addTxReadingWithLineReadings(Long txReadingId, TxReadingRequest txReadingDTO, String username) {
 
     }
 
     @Override
-    public CreateBoxNumberResponse createBoxNumber(Long poleId, Principal principal) {
+    public CreateBoxNumberResponse createBoxNumber(Long poleId, String username) {
         return null;
     }
 }

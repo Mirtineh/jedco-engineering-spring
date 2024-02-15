@@ -6,7 +6,6 @@ import com.jedco.jedcoengineeringspring.rest.response.PoleResponse;
 import com.jedco.jedcoengineeringspring.rest.response.TransformerResponse;
 import com.jedco.jedcoengineeringspring.rest.response.TxResponse;
 
-import java.security.Principal;
 import java.util.List;
 
 public interface TxDataService {
@@ -24,9 +23,9 @@ public interface TxDataService {
 
     List<TransformerResponse> listTransformerByDate(String date);
 
-    void addTxReadingWithLineReadings(Long txReadingId, TxReadingRequest txReadingDTO, Principal principal);
+    void addTxReadingWithLineReadings(Long txReadingId, TxReadingRequest txReadingDTO, String username);
 
-    CreateBoxNumberResponse createBoxNumber(Long poleId, Principal principal);
+    CreateBoxNumberResponse createBoxNumber(Long poleId, String username);
 
 
 }
