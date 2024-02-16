@@ -33,6 +33,11 @@ public class CommissioningController {
         return this.lvCommissioningService.checkRef(meterNo);
     }
 
+    @GetMapping("/checkDispatchedMeter")
+    public DispatchedMeterResponse checkDispatchedMeter(@RequestParam("meterNo") String meterNo) {
+        return this.lvCommissioningService.checkDispatchedMeter(meterNo);
+    }
+
     @GetMapping("/checkDispatchedMeterForMeterChange")
     public DispatchedMeterResponse checkDispatchedMeterForMeterChange(@RequestParam("meterNo") String meterNo) {
         return this.lvCommissioningService.checkDispatchedMeterForMeterChange(meterNo);

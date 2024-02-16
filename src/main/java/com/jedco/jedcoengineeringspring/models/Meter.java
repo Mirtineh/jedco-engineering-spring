@@ -16,5 +16,5 @@ import lombok.*;
 public class Meter{
     @Id
     @Column(name="meterno")
-    private String meterno;
+    private String meterNo;
 }
