@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,11 @@ public class CommissioningController {
     @GetMapping("/checkRef")
     public RefResponse checkMeter(@RequestParam("meterNo") String meterNo) {
         return this.lvCommissioningService.checkRef(meterNo);
+    }
+
+    @GetMapping("/checkDispatchedMeter")
+    public DispatchedMeterResponse checkDispatchedMeter(@RequestParam("meterNo") String meterNo) {
+        return this.lvCommissioningService.checkDispatchedMeter(meterNo);
     }
 
     @GetMapping("/checkDispatchedMeterForMeterChange")
