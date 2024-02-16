@@ -29,15 +29,16 @@ public class CommissioningServiceImpl implements CommissioningService {
     private final PoleDataMapper poleDataMapper;
     private final BoxNumberMapper boxNumberMapper;
     private final UTMtoLangLatService utMtoLangLatService;
+
     @Override
     public RefResponse checkRef(String meterNo) {
-        Long activeStatus=1L;
-        List<MeterData> meters = meterDataRepository.findAllByMeterNoAndStatusId(meterNo,activeStatus);
+        Long activeStatus = 1L;
+        List<MeterData> meters = meterDataRepository.findAllByMeterNoAndStatusId(meterNo, activeStatus);
         if (meters.isEmpty()) {
-            return new RefResponse(false, "Reference Meter Not found!",null);
-        }else if(meters.size()>1){
-            return new RefResponse(false, "Reference Meter is not unique!",null);
-        }else {
+            return new RefResponse(false, "Reference Meter Not found!", null);
+        } else if (meters.size() > 1) {
+            return new RefResponse(false, "Reference Meter is not unique!", null);
+        } else {
             PoleData poleData = meters.get(0).getPoleData();
             LvPoleResponse poleResponseDto = poleDataMapper.toPoleResponse(poleData);
             return new RefResponse(true, "Reference Pole Data Found!", poleResponseDto);
@@ -46,17 +47,17 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public DispatchedMeterResponse checkDispatchedMeter(String meterNo) {
-        List<DispatchedMeter> meters= dispatchedMeterRepository.findByMeterNo(meterNo);
+        List<DispatchedMeter> meters = dispatchedMeterRepository.findByMeterNo(meterNo);
         return getDispatchedMeterResponse(meters);
     }
 
     @Override
     public DispatchedMeterResponse checkDispatchedMeterForMeterChange(String meterNo) {
-        List<DispatchedMeter> meters=dispatchedMeterRepository.findByMeterNo(meterNo);
-        Long activeStatus= 1L;
-        MeterData commissionedMeter= meterDataRepository.findOneByMeterNoAndStatusId(meterNo,activeStatus);
-        if(commissionedMeter != null){
-            return new DispatchedMeterResponse(false, "Reference Meter already Commissioned!",null,null);
+        List<DispatchedMeter> meters = dispatchedMeterRepository.findByMeterNo(meterNo);
+        Long activeStatus = 1L;
+        MeterData commissionedMeter = meterDataRepository.findOneByMeterNoAndStatusId(meterNo, activeStatus);
+        if (commissionedMeter != null) {
+            return new DispatchedMeterResponse(false, "Reference Meter already Commissioned!", null, null);
         }
         return getDispatchedMeterResponse(meters);
     }
@@ -64,11 +65,11 @@ public class CommissioningServiceImpl implements CommissioningService {
     @NotNull
     private DispatchedMeterResponse getDispatchedMeterResponse(List<DispatchedMeter> meters) {
         if (meters.isEmpty()) {
-            return new DispatchedMeterResponse(false, "Reference Meter Not found!",null,null);
-        }else if(meters.size()>1){
-            return new DispatchedMeterResponse(false, "Reference Meter is not unique!",null,null);
-        }else {
-            return new DispatchedMeterResponse(true, "Reference Meter Found!", meters.get(0).getMeterNo(),meters.get(0).getName());
+            return new DispatchedMeterResponse(false, "Reference Meter Not found!", null, null);
+        } else if (meters.size() > 1) {
+            return new DispatchedMeterResponse(false, "Reference Meter is not unique!", null, null);
+        } else {
+            return new DispatchedMeterResponse(true, "Reference Meter Found!", meters.get(0).getMeterNo(), meters.get(0).getName());
         }
     }
 
@@ -76,35 +77,35 @@ public class CommissioningServiceImpl implements CommissioningService {
     public ResponseDto insertCommissioningData(CommissioningRegisterRequest lvDataRegisterDto, String username) {
         try {
 
-            Long activeStatus= 1L;
+            Long activeStatus = 1L;
             for (LvMeterDataRequest meter : lvDataRegisterDto.meterDataDtoList()) {
-                MeterData meterData = meterDataRepository.findOneByMeterNoAndStatusId(meter.meterNo(),activeStatus);
-                if(meterData!=null){
-                    return new ResponseDto(false, "Meter No. "+meter.meterNo()+" Already registered in the system");
+                MeterData meterData = meterDataRepository.findOneByMeterNoAndStatusId(meter.meterNo(), activeStatus);
+                if (meterData != null) {
+                    return new ResponseDto(false, "Meter No. " + meter.meterNo() + " Already registered in the system");
                 }
             }
 
             //TODO Check this part for duplicate cases
             Optional<PoleData> optionalPoleData;
-            if(lvDataRegisterDto.poleId()!=null){
-               optionalPoleData = poleDataRepository.findById(lvDataRegisterDto.poleId());
-            }else{
+            if (lvDataRegisterDto.poleId() != null) {
+                optionalPoleData = poleDataRepository.findById(lvDataRegisterDto.poleId());
+            } else {
                 optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
             }
 
-            if(optionalPoleData.isEmpty()){
+            if (optionalPoleData.isEmpty()) {
                 return new ResponseDto(false, "Lv Pole Not Found!");
             }
 
             Status status = statusRepository.findById(activeStatus).get();
             User user = userRepository.findByUsername(username).get();
 
-            var poleData= optionalPoleData.get();
+            var poleData = optionalPoleData.get();
             //TODO CHECK THIS PART CAREFULLY
             poleDataRepository.save(poleData);
 
             for (LvMeterDataRequest meter : lvDataRegisterDto.meterDataDtoList()) {
-                BoxNumber boxNumber=boxNumberRepository.findById(meter.boxNoId()).get();
+                BoxNumber boxNumber = boxNumberRepository.findById(meter.boxNoId()).get();
                 MeterData meterData = new MeterData();
 
                 meterData.setComCableLength(meter.comCableLength());
@@ -139,22 +140,22 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public ResponseDto registerNewTx(TxInsertRequest registerDto, String username) {
-        try{
+        try {
             Optional<TxInfo> optionalTxInfo = txInfoRepository.findByTrafoCode(registerDto.trafoCode());
 
             Optional<User> optionalUser = userRepository.findByUsername(username);
-            if(optionalUser.isEmpty()){
+            if (optionalUser.isEmpty()) {
                 return new ResponseDto(false, "User Not Found!");
 
             }
-            if(optionalTxInfo.isPresent()){
+            if (optionalTxInfo.isPresent()) {
                 return new ResponseDto(false, "Transformer Already Exist in the system with the same name!");
 
             }
-            var user= optionalUser.get();
-            LongLatResponse longLatResponse= this.utMtoLangLatService.convertUTMToLangLat(registerDto.northing(),registerDto.easting());
+            var user = optionalUser.get();
+            LongLatResponse longLatResponse = this.utMtoLangLatService.convertUTMToLangLat(registerDto.northing(), registerDto.easting());
             TxInfo newTx = new TxInfo();
-            Date date= new Date();
+            Date date = new Date();
             newTx.setTrafoCode(registerDto.trafoCode());
             newTx.setEasting(registerDto.easting());
             newTx.setNorthing(registerDto.northing());
@@ -172,7 +173,7 @@ public class CommissioningServiceImpl implements CommissioningService {
             txInfoRepository.save(newTx);
 
             return new ResponseDto(true, "New Transformer Registered Successfully!");
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             return new ResponseDto(false, "Transformer Registration Failed!");
 
@@ -181,21 +182,21 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public ResponseDto updateTx(TxInsertRequest registerDto, String username) {
-        try{
-            if(registerDto.trafoCode()==null){
-                return new ResponseDto(false,"Transformer Code can not be empty");
+        try {
+            if (registerDto.trafoCode() == null) {
+                return new ResponseDto(false, "Transformer Code can not be empty");
             }
             User user = userRepository.findByUsername(username).get();
-            Optional<TxInfo> optionalTxInfo= txInfoRepository.findById(registerDto.id());
-            if(optionalTxInfo.isEmpty()){
-                return new ResponseDto(false,"Transformer Not Found");
+            Optional<TxInfo> optionalTxInfo = txInfoRepository.findById(registerDto.id());
+            if (optionalTxInfo.isEmpty()) {
+                return new ResponseDto(false, "Transformer Not Found");
             }
-            var txInfo= optionalTxInfo.get();
-            Optional<TxInfo> optionalTrafo= txInfoRepository.findByTrafoCode(registerDto.trafoCode());
-            if(optionalTrafo.isPresent() && !Objects.equals(optionalTrafo.get().getId(), txInfo.getId())){
+            var txInfo = optionalTxInfo.get();
+            Optional<TxInfo> optionalTrafo = txInfoRepository.findByTrafoCode(registerDto.trafoCode());
+            if (optionalTrafo.isPresent() && !Objects.equals(optionalTrafo.get().getId(), txInfo.getId())) {
                 return new ResponseDto(false, "Transformer Already Exist in the system with the same name!");
             }
-            LongLatResponse longLatResponse= this.utMtoLangLatService.convertUTMToLangLat(registerDto.northing(),registerDto.easting());
+            LongLatResponse longLatResponse = this.utMtoLangLatService.convertUTMToLangLat(registerDto.northing(), registerDto.easting());
             txInfo.setTrafoCode(registerDto.trafoCode());
             txInfo.setEasting(registerDto.easting());
             txInfo.setNorthing(registerDto.northing());
@@ -208,8 +209,7 @@ public class CommissioningServiceImpl implements CommissioningService {
             txInfo.setUpdatedOn(new Date());
             txInfoRepository.save(txInfo);
             return new ResponseDto(true, "Transformer Updated Successfully!");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             return new ResponseDto(false, "Transformer Update Failed!");
         }
@@ -217,18 +217,18 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public ResponseDto registerMeterChange(String oldMeter, String newMeter, String username) {
-        try{
+        try {
             //TODO add delete access for some users
             User user = userRepository.findByUsername(username).get();
             Long activeStatus = 1L;
-            List<MeterData> chkMeter = meterDataRepository.findAllByMeterNoAndStatusId(oldMeter,activeStatus);
-            if(chkMeter.isEmpty()){
+            List<MeterData> chkMeter = meterDataRepository.findAllByMeterNoAndStatusId(oldMeter, activeStatus);
+            if (chkMeter.isEmpty()) {
                 return new ResponseDto(true, "Old Meter Not Found in the system");
-            }else if(chkMeter.size()>1){
+            } else if (chkMeter.size() > 1) {
                 return new ResponseDto(true, "Old Meter Not Unique in the system");
             }
             MeterData meter = chkMeter.get(0);
-            Long reversedStatus= 7L;
+            Long reversedStatus = 7L;
             meter.setStatus(statusRepository.findById(reversedStatus).get());
             meterDataRepository.save(meter);
 
@@ -255,7 +255,7 @@ public class CommissioningServiceImpl implements CommissioningService {
             meterDataRepository.save(meterData);
 
             return new ResponseDto(true, "Meter Change done successfully!");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             return new ResponseDto(false, "Meter Change Failed");
         }
@@ -263,22 +263,22 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public ResponseDto registerMeterRelocation(MeterRelocationRequest relocationDto, String username) {
-        try{
+        try {
             User user = userRepository.findByUsername(username).get();
             Long activeStatus = 1L;
-            List<MeterData> chkMeter = meterDataRepository.findAllByMeterNoAndStatusId(relocationDto.meterNo(),activeStatus);
-            if(chkMeter.isEmpty()){
+            List<MeterData> chkMeter = meterDataRepository.findAllByMeterNoAndStatusId(relocationDto.meterNo(), activeStatus);
+            if (chkMeter.isEmpty()) {
                 return new ResponseDto(true, "Meter Not Found in the system");
-            }else if(chkMeter.size()>1){
+            } else if (chkMeter.size() > 1) {
                 return new ResponseDto(true, "Meter Not Unique in the system");
             }
 
             Optional<PoleData> optionalDestPole = poleDataRepository.findById(relocationDto.poleId());
-            if(optionalDestPole.isEmpty()){
+            if (optionalDestPole.isEmpty()) {
                 return new ResponseDto(true, "Destination Pole Not Found!");
             }
-            Optional<BoxNumber> optionalDestBoxNumber= boxNumberRepository.findById(relocationDto.boxNoId());
-            if(optionalDestBoxNumber.isEmpty()){
+            Optional<BoxNumber> optionalDestBoxNumber = boxNumberRepository.findById(relocationDto.boxNoId());
+            if (optionalDestBoxNumber.isEmpty()) {
                 return new ResponseDto(true, "Box Number Not Found!");
             }
             var destPole = optionalDestPole.get();
@@ -311,7 +311,7 @@ public class CommissioningServiceImpl implements CommissioningService {
             meterDataRepository.save(meterData);
 
             return new ResponseDto(true, "Meter Relocation done successfully!");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage());
             return new ResponseDto(false, "Meter Relocation Failed");
         }
@@ -326,7 +326,7 @@ public class CommissioningServiceImpl implements CommissioningService {
                 return new ResponseDto(false, "Pole No. Already registered with the same Tx Code.");
             }
 
-            Long activeStatus= 1L;
+            Long activeStatus = 1L;
             Status status = statusRepository.findById(activeStatus).get();
             User user = userRepository.findByUsername(username).get();
 
@@ -362,8 +362,8 @@ public class CommissioningServiceImpl implements CommissioningService {
 
     @Override
     public List<BoxNumberResponse> getBoxNumbers(Long poleId) {
-        PoleData poleData= poleDataRepository.findById(poleId).get();
-        Set<BoxNumber> boxNumbers=poleData.getBoxNumbers();
+        PoleData poleData = poleDataRepository.findById(poleId).get();
+        Set<BoxNumber> boxNumbers = poleData.getBoxNumbers();
         return boxNumbers.stream().map(boxNumberMapper::toBoxNumberResponse).collect(Collectors.toList());
     }
 }
