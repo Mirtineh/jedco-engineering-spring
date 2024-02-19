@@ -2,6 +2,7 @@ package com.jedco.jedcoengineeringspring.repositories;
 
 import com.jedco.jedcoengineeringspring.models.TxInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +12,8 @@ public interface TxInfoRepository extends JpaRepository<TxInfo,Long> {
 
     Optional<TxInfo> findByTrafoCode(String s);
 
-    List<TxInfo> findDistinctByFeederCodeIsNotNull();
+    @Query("SELECT DISTINCT t.feederCode FROM TxInfo t")
+    List<String> findDistinctByFeederCode();
 
     List<TxInfo> findAllByFeederCode(String feeder);
 

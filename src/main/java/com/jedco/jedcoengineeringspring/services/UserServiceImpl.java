@@ -144,7 +144,11 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> usersListByRole(Long roleId) {
         Long deletedStatus = 3L;
         List<User> userList = userRepository.findByUserRoleIdAndStatusIdNot(roleId, deletedStatus);
-        return userList.stream().map(userMapper::toUserResponse).toList();
+        return userList
+                .stream()
+                .filter(user -> user.getUsername() == null || !user.getUsername().equals("admin"))
+                .map(userMapper::toUserResponse)
+                .toList();
     }
 
     @Override
