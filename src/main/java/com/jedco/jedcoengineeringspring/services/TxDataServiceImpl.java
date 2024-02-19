@@ -32,8 +32,7 @@ public class TxDataServiceImpl implements TxDataService {
 
     @Override
     public List<String> listFeeder() {
-        List<TxInfo> txInfoList=txInfoRepository.findDistinctByFeederCodeIsNotNull();
-        return txInfoList.stream().map(TxInfo::getFeederCode).toList();
+        return txInfoRepository.findDistinctByFeederCode();
     }
 
     @Override
