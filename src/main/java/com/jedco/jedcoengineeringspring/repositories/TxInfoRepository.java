@@ -11,7 +11,7 @@ public interface TxInfoRepository extends JpaRepository<TxInfo,Long> {
 
     Optional<TxInfo> findByTrafoCode(String s);
 
-    List<String> findDistinctFeederCodes();
+    List<TxInfo> findDistinctByFeederCodeIsNotNull();
 
     List<TxInfo> findAllByFeederCode(String feeder);
 

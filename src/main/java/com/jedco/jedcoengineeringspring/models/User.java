@@ -42,8 +42,9 @@ public class User extends BaseEntity{
     @Column(name="password", length=100)
     private String password;
 
-    @Column(name="registered_by")
-    private Long registeredBy;
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="registered_by", nullable=false)
+    private User registeredBy;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="registered_date", nullable=false, length=23)

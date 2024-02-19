@@ -28,7 +28,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/listUsers")
-    public List<UserResponse> listUsers(@RequestParam("start") Integer startPosition, @RequestParam("max") Integer maxResult) {
+    public List<UserResponse> listUsers(@RequestParam(value = "start",required = false) Integer startPosition, @RequestParam(value = "max",required = false) Integer maxResult) {
         return this.userService.listUsers(startPosition, maxResult);
     }
 

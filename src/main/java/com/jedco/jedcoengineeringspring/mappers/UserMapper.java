@@ -1,13 +1,7 @@
 package com.jedco.jedcoengineeringspring.mappers;
 
-import com.jedco.jedcoengineeringspring.models.ActionGroup;
-import com.jedco.jedcoengineeringspring.models.RoleDefinition;
-import com.jedco.jedcoengineeringspring.models.UserAction;
-import com.jedco.jedcoengineeringspring.models.UserRole;
-import com.jedco.jedcoengineeringspring.rest.response.RoleDefinitionResponse;
-import com.jedco.jedcoengineeringspring.rest.response.UserActionResponse;
-import com.jedco.jedcoengineeringspring.rest.response.UserActionsListByGroupResponse;
-import com.jedco.jedcoengineeringspring.rest.response.UserRoleResponse;
+import com.jedco.jedcoengineeringspring.models.*;
+import com.jedco.jedcoengineeringspring.rest.response.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -24,7 +18,7 @@ public interface UserMapper {
     RoleDefinitionResponse toRoleDefinitionResponse(RoleDefinition roleDefinition, UserRole userRole);
 
     @Mapping(target = "action", source = "actionName")
-    @Mapping(target = "groupName", source = "actionGroup.name")
+    @Mapping(target = "groupName", source = "actionGroup.groupName")
     @Mapping(target = "groupId", source = "actionGroup.id")
     UserActionResponse toUserActionResponse(UserAction userAction);
 
@@ -33,14 +27,32 @@ public interface UserMapper {
         return Collections.singletonList(toUserActionResponse(userAction));
     }
 
-    @Mapping(target = "groupName", source = "name")
+    @Mapping(target = "groupName", source = "groupName")
     @Mapping(target = "groupId", source = "id")
-    @Mapping(target = "groupDescription", source = "description")
+    @Mapping(target = "groupDescription", source = "groupDescription")
     @Mapping(target = "actionsDtos", source = "userActions")
     UserActionsListByGroupResponse toUserAction(ActionGroup actionGroup);
+
+    @Mapping(target = "userActionId", source = "id")
+    @Mapping(target = "action", source = "actionName")
+    @Mapping(target = "actionStatus",source = "actionStatus", qualifiedByName = "mapToActionStatus")
+    ActionResponse toActionResponse(UserAction userAction);
+
+    @Named("mapToActionStatus")
+    default boolean mapToActionStatus(long actionStatus){
+        return actionStatus == 1;
+    }
 
     @Mapping(target = "name", source = "roleName")
     @Mapping(target = "description", source = "roleDescription")
     @Mapping(target = "createdOn", source = "registeredDate")
+    @Mapping(target = "status", source = "status.name")
     UserRoleResponse toUserRoleResponse(UserRole userRole);
+
+    @Mapping(target = "userStatusId", source = "status.id")
+    @Mapping(target = "userStatus", source = "status.name")
+    @Mapping(target = "userRoleId", source = "userRole.id")
+    @Mapping(target = "registeredBy", expression = "java(user.getRegisteredBy().getFirstName() + ' ' + user.getRegisteredBy().getLastName())")
+    @Mapping(target = "userRole", source = "userRole.roleName")
+    UserResponse toUserResponse(User user);
 }
