@@ -55,7 +55,7 @@ public class LvDataServiceImpl implements LvDataService {
         }else{
             poleDataList= poleDataRepository.findAllByRegisteredByAndSubmittedOnBetween(user, day.startTime(), day.endTime());
         }
-        getLvDataResponses(poleDataList);
+        return getLvDataResponses(poleDataList);
 
     }
 
