@@ -38,14 +38,14 @@ public class TxInfo extends BaseEntity{
     private Double longitude;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="registered_on", nullable=false, length=23)
+    @Column(name="registered_on", length=23)
     private Date registeredOn;
 
     @Column(name="registered_by", precision=53, scale=0)
     private Long registeredBy;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="updated_on", nullable=false, length=23)
+    @Column(name="updated_on", length=23)
     private Date updatedOn;
 
     @Column(name="updated_by", precision=53, scale=0)

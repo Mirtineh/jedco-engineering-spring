@@ -1,9 +1,10 @@
 package com.jedco.jedcoengineeringspring.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +19,8 @@ public class ActionGroup extends BaseEntity {
 
     @Column(name="group_description", length=250)
     private String groupDescription;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "actionGroup")
+    private List<UserAction> userActions = new ArrayList<>();
+
 }

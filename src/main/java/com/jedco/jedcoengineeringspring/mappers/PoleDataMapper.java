@@ -13,7 +13,7 @@ import java.util.List;
 public interface PoleDataMapper {
     LvPoleResponse toPoleResponse(PoleData poleData);
 
-    @Mapping(target = "poleRegistrationType", source = "poleRegType")
+    @Mapping(target = "poleRegistrationType", source = "poleData.poleRegType")
     @Mapping(target = "meterDataDtoList", source = "meterDataList")
     LvDataResponse toLvDataResponse(PoleData poleData, List<MeterData> meterDataList);
 
