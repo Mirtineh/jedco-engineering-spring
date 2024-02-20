@@ -13,4 +13,6 @@ public interface RoleDefinitionRepository extends JpaRepository<RoleDefinition,L
     List<RoleDefinition> findByUserRoleIdAndStatusId(Long id, Long activeStatus);
 
     Optional<RoleDefinition> findOneByUserActionIdAndUserRoleId(Long userActionId, Long id);
+
+    List<RoleDefinition> findAllByUserRoleAndStatus_Id(UserRole userRole, long l);
 }

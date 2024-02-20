@@ -9,23 +9,26 @@ import org.mapstruct.Named;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserMapper {
-    @Mapping(target = "userActionList", source = "roleDefinition.userAction", qualifiedByName = "mapUserActionList")
-    @Mapping(target = "roleName", source = "userRole.roleName")
     @Mapping(target = "roleId", source = "userRole.id")
-    RoleDefinitionResponse toRoleDefinitionResponse(RoleDefinition roleDefinition, UserRole userRole);
+    @Mapping(target = "roleName", source = "userRole.roleName")
+    @Mapping(target = "userActionList", source = "roleDefinitions", qualifiedByName = "mapToUserAction")
+    RoleDefinitionResponse roleDefinitionResponse(List<RoleDefinition> roleDefinitions, UserRole userRole);
 
-    @Mapping(target = "action", source = "actionName")
-    @Mapping(target = "groupName", source = "actionGroup.groupName")
-    @Mapping(target = "groupId", source = "actionGroup.id")
-    UserActionResponse toUserActionResponse(UserAction userAction);
-
-    @Named("mapUserActionList")
-    default List<UserActionResponse> mapUserActionList(UserAction userAction){
-        return Collections.singletonList(toUserActionResponse(userAction));
+    @Named("mapToUserAction")
+    default List<UserActionResponse> toUserActionListDtoList(List<RoleDefinition> roleDefinitions) {
+        return roleDefinitions.stream()
+                .map(this::toUserActionListDto)
+                .collect(Collectors.toList());
     }
+    @Mapping(target = "id", source = "userAction.id")
+    @Mapping(target = "action", source = "userAction.actionName")
+    @Mapping(target = "groupId", source = "userAction.actionGroup.id")
+    @Mapping(target = "groupName", source = "userAction.actionGroup.groupName")
+    UserActionResponse toUserActionListDto(RoleDefinition roleDefinition);
 
     @Mapping(target = "groupName", source = "groupName")
     @Mapping(target = "groupId", source = "id")

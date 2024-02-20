@@ -1,0 +1,44 @@
+<configuration>
+
+    <!-- Define the rolling file appender -->
+    <appender name="infoFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/engineering/info/app-info.log</file> <!-- Replace with the desired log file base name (without date) -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Define the filename pattern with daily rollover -->
+            <fileNamePattern>/var/log/engineering/info/app.info.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Set the maximum number of days to keep log files (optional) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <appender name="errorFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/var/log/engineering/error/app-error.log</file> <!-- Replace with the desired log file base name (without date) -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Define the filename pattern with daily rollover -->
+            <fileNamePattern>/var/log/engineering/error/app.error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- Set the maximum number of days to keep log files (optional) -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{ISO8601} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- Set the root logger to use the rolling file appender -->
+    <!-- Root logger with both appenders -->
+    <root level="info">
+        <appender-ref ref="infoFile"/>
+        <appender-ref ref="errorFile"/>
+    </root>
+
+</configuration>
