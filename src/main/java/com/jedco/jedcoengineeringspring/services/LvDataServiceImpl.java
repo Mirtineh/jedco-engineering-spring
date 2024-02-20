@@ -35,7 +35,7 @@ public class LvDataServiceImpl implements LvDataService {
 
     private final PoleDataMapper poleDataMapper;
     private final UTMtoLangLatService utMtoLangLatService;
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
     @Override
     public ResponseDto checkMeter(String meterNo) {
         Optional<Meter> optionalMeter= meterRepository.findByMeterNo(meterNo);

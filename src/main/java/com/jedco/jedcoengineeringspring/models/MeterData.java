@@ -54,7 +54,7 @@ public class MeterData extends BaseEntity {
     private String boxAssemblyType;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="registered_on", nullable=false, length=23)
+    @Column(name="registered_on", length=23)
     private Date registeredOn;
 
     @Column(name="registered_by", length=100)
