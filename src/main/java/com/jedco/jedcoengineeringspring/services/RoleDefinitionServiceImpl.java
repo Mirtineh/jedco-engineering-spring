@@ -11,9 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -136,13 +134,13 @@ public class RoleDefinitionServiceImpl implements RoleDefinitionService {
 
     @Override
     public List<RoleDefinitionResponse> definedRolesList(Long userRoleId) {
-        UserRole userRole = userRoleRepository.findById(userRoleId).get();
-        return userRole.getRoleDefinitions().stream().map(roleDefinition -> {
-            if (roleDefinition.getStatus().getId().equals(1L)) {
-                return userMapper.toRoleDefinitionResponse(roleDefinition, userRole);
-            }
-            return null;
-        }).toList();
+        Optional<UserRole> optionalUserRole = userRoleRepository.findById(userRoleId);
+        if (optionalUserRole.isEmpty()) {
+            return new ArrayList<>();
+        }
+        UserRole userRole = optionalUserRole.get();
+        List<RoleDefinition> roleDefinitions = roleDefinitionRepository.findAllByUserRoleAndStatus_Id(userRole, 1L);
+        return Collections.singletonList(userMapper.roleDefinitionResponse(roleDefinitions, userRole));
     }
 
     @Override
