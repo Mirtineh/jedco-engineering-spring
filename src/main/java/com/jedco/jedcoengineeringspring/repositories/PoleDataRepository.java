@@ -20,4 +20,10 @@ public interface PoleDataRepository extends JpaRepository<PoleData,Long> {
     List<PoleData> findByFeederAndTxNoAndPoleNo(String feeder, String txCode, String poleNo);
 
     List<PoleData> findByPoleNo(String poleNo);
+
+    List<PoleData> findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(String feeder, String txCode, String poleNo);
+
+    List<PoleData> findAllByTransformerTrafoCodeAndTransformerFeederCode(String txCode, String feeder);
+
+    Optional<PoleData> findOneByPoleNoAndTransformerTrafoCode(String s, String s1);
 }

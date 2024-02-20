@@ -90,7 +90,8 @@ public class CommissioningServiceImpl implements CommissioningService {
             if (lvDataRegisterDto.poleId() != null) {
                 optionalPoleData = poleDataRepository.findById(lvDataRegisterDto.poleId());
             } else {
-                optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+//                optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+                optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
             }
 
             if (optionalPoleData.isEmpty()) {
@@ -321,7 +322,8 @@ public class CommissioningServiceImpl implements CommissioningService {
     public ResponseDto registerLvExtension(LvExtensionRegisterRequest registerDto, String username) {
         try {
 
-            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(registerDto.poleNo(), registerDto.txNo());
+//            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(registerDto.poleNo(), registerDto.txNo());
+            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(registerDto.poleNo(), registerDto.txNo());
             if (optionalPoleData.isPresent()) {
                 return new ResponseDto(false, "Pole No. Already registered with the same Tx Code.");
             }

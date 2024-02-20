@@ -61,7 +61,8 @@ public class LvDataServiceImpl implements LvDataService {
 
     @Override
     public List<LvDataResponse> getDataByFeederAndTx(String feeder, String txCode) {
-        List<PoleData> poleDataList= poleDataRepository.findAllByFeederAndTxNo(feeder,txCode);
+//        List<PoleData> poleDataList= poleDataRepository.findAllByFeederAndTxNo(feeder,txCode);
+        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCode(txCode,feeder);
         return getLvDataResponses(poleDataList);
     }
 
@@ -75,7 +76,8 @@ public class LvDataServiceImpl implements LvDataService {
 
     @Override
     public List<LvDataResponse> getDataByFeederTxPole(String feeder, String txCode, String poleNo) {
-        List<PoleData> poleDataList= poleDataRepository.findByFeederAndTxNoAndPoleNo(feeder,txCode,poleNo);
+//        List<PoleData> poleDataList= poleDataRepository.findByFeederAndTxNoAndPoleNo(feeder,txCode,poleNo);
+        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(feeder,txCode,poleNo);
         return getLvDataResponses(poleDataList);
     }
 
@@ -88,7 +90,8 @@ public class LvDataServiceImpl implements LvDataService {
     @Override
     public ResponseDto insertLvData(LvDataRegisterRequest lvDataRegisterDto, String username) {
         try {
-            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+//            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
             if (optionalPoleData.isPresent()) {
                 return new ResponseDto(false, "Pole No. Already registered with the same Tx Code.");
             }
@@ -162,6 +165,7 @@ public class LvDataServiceImpl implements LvDataService {
 
             return new ResponseDto(true, "Lv Network data Registered Successfully");
         } catch (Exception ex) {
+            log.error("Lv Pole data registeration failed..."+ex.getMessage());
             return new ResponseDto(false, "Lv Network data Registration Failed!");
 
         }
@@ -185,8 +189,8 @@ public class LvDataServiceImpl implements LvDataService {
     public ResponseDto updateLvData(LvDataResponse updateDto, String username) {
         try {
             Optional<PoleData> optionalPoleData = poleDataRepository.findById(updateDto.id());
-            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTxNo(updateDto.poleNo(), updateDto.txNo());
-
+//            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTxNo(updateDto.poleNo(), updateDto.txNo());
+            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(updateDto.poleNo(), updateDto.txNo());
             if(optionalPoleData.isEmpty()){
                 return new ResponseDto(false, "Pole Not Found");
             }
@@ -269,6 +273,7 @@ public class LvDataServiceImpl implements LvDataService {
 
             return new ResponseDto(true, "Lv Network data Registered Successfully");
         } catch (Exception ex) {
+            log.error("Lv Pole data update failed..."+ex.getMessage());
             return new ResponseDto(false, "Lv Network data Registration Failed!");
 
         }

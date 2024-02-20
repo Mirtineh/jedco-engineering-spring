@@ -23,6 +23,10 @@ public class PoleData extends BaseEntity{
     @JoinColumn(name="reg_by", nullable=false)
     private User registeredBy;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="tx_id", nullable=false)
+    private TxInfo transformer;
+
     @Column(name="feeder", length=10)
     private String feeder;
 

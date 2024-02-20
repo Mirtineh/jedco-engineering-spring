@@ -43,7 +43,8 @@ public class TxDataServiceImpl implements TxDataService {
 
     @Override
     public List<PoleResponse> listPoleByFeederTx(String feeder, String tx) {
-        List<PoleData> poleDataList = poleDataRepository.findAllByFeederAndTxNo(feeder, tx);
+//        List<PoleData> poleDataList = poleDataRepository.findAllByFeederAndTxNo(feeder, tx);
+        List<PoleData> poleDataList = poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCode(feeder, tx);
         return poleDataList.stream().map(txMapper::toPoleResponse).toList();
     }
 
