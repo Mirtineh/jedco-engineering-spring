@@ -1,10 +1,7 @@
 package com.jedco.jedcoengineeringspring.controllers;
 
 import com.jedco.jedcoengineeringspring.rest.request.TxReadingRequest;
-import com.jedco.jedcoengineeringspring.rest.response.CreateBoxNumberResponse;
-import com.jedco.jedcoengineeringspring.rest.response.PoleResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TransformerResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TxResponse;
+import com.jedco.jedcoengineeringspring.rest.response.*;
 import com.jedco.jedcoengineeringspring.services.TxDataService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -68,6 +65,18 @@ public class TxDataController {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         this.txDataService.addTxReadingWithLineReadings(txReadingId, txReadingDTO, userDetails.getUsername());
         return ResponseEntity.ok("{\"message\": \"TxReading with LineReadings added successfully\"}");
+    }
+    @GetMapping("/txReadingByDate")
+    public List<TxReadingResponse> getTxReading(@RequestParam("date") String date){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return txDataService.getTxReadingByDate(date,userDetails.getUsername());
+    }
+    @PutMapping("/updateTxReading")
+    public ResponseDto updateTxReading(@RequestBody TxReadingResponse txReadingUpdateRequest){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return txDataService.updateTxReading(txReadingUpdateRequest,userDetails.getUsername());
     }
 
     @PostMapping("/createBoxNumber/{poleId}")

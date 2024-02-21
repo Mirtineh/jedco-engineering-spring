@@ -7,10 +7,7 @@ import com.jedco.jedcoengineeringspring.models.*;
 import com.jedco.jedcoengineeringspring.repositories.*;
 import com.jedco.jedcoengineeringspring.rest.request.TxLineReadingRequest;
 import com.jedco.jedcoengineeringspring.rest.request.TxReadingRequest;
-import com.jedco.jedcoengineeringspring.rest.response.CreateBoxNumberResponse;
-import com.jedco.jedcoengineeringspring.rest.response.PoleResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TransformerResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TxResponse;
+import com.jedco.jedcoengineeringspring.rest.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +24,7 @@ public class TxDataServiceImpl implements TxDataService {
     private final UserRepository userRepository;
     private final BoxNumberRepository boxNumberRepository;
     private final FeederRepository feederRepository;
+    private final TxLineReadingRepository txLineReadingRepository;
 
     private final TxMapper txMapper;
     private final DateConverter dateConverter;
@@ -122,6 +120,50 @@ public class TxDataServiceImpl implements TxDataService {
             return new CreateBoxNumberResponse("B0" + number);
         }
         return new CreateBoxNumberResponse("B" + number);
+    }
+
+    @Override
+    public List<TxReadingResponse> getTxReadingByDate(String date, String username) {
+        User user = userRepository.findByUsername(username).get();
+        Day day= dateConverter.convertToStartAndEndDate(date);
+        List<TxReading> txReadingList = txReadingRepository.findAllByCreatedByAndCreatedOnBetween(user,day.startTime(),day.endTime());
+        return txReadingList.stream().map(txMapper::toTxReadingResponse).toList();
+    }
+
+    @Override
+    public ResponseDto updateTxReading(TxReadingResponse txReadingUpdateRequest, String username) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if(optionalUser.isEmpty()){
+            return new ResponseDto(false,"User not Found!");
+        }
+        var user= optionalUser.get();
+        Optional<TxReading> optionalTxReading= txReadingRepository.findById(txReadingUpdateRequest.id());
+        if(optionalTxReading.isEmpty()){
+            return new ResponseDto(false,"Tx Reading not Found!");
+        }
+        var txReading = optionalTxReading.get();
+        for(TxLineReadingResponse lineReadingResponse: txReadingUpdateRequest.lineReadings()){
+            Optional<TxLineReading> optionalTxLineReading= txLineReadingRepository.findById(lineReadingResponse.id());
+            if(optionalTxLineReading.isEmpty()){
+                return new ResponseDto(false,"Line Reading not found");
+            }
+            var txLineReading= optionalTxLineReading.get();
+            if(!txLineReading.getTxReading().equals(txReading)){
+                return new ResponseDto(false,"Line Reading does not belong to Tx Reading!");
+            }
+            txLineReading.setLine(lineReadingResponse.line());
+            txLineReading.setCurrent(lineReadingResponse.current());
+            txLineReading.setVoltage(lineReadingResponse.voltage());
+            txLineReading.setPower((lineReadingResponse.current() * lineReadingResponse.voltage() * 0.95) / 1000);
+            txLineReadingRepository.save(txLineReading);
+        }
+        txReading.setBranch(txReadingUpdateRequest.branch());
+        txReading.setNeutralCurrent(txReadingUpdateRequest.neutralCurrent());
+        txReading.setRemark(txReadingUpdateRequest.remark());
+        txReading.setUpdatedOn(new Date());
+        txReading.setUpdatedBy(user);
+        txReadingRepository.save(txReading);
+        return new ResponseDto(true,"Reading Updated Successfully!");
     }
 
     //TODO Check this method carefully
