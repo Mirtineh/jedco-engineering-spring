@@ -12,8 +12,8 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TxMapper {
     TxResponse toTxResponse(TxInfo txInfo);
-    @Mapping(target = "trafoCode", source = "txNo")
-    @Mapping(target = "feederCode", source = "feeder")
+    @Mapping(target = "trafoCode", source = "transformer.trafoCode")
+    @Mapping(target = "feederCode", source = "transformer.feederCode")
     PoleResponse toPoleResponse(PoleData poleData);
 
     @Mapping(target = "transformerCapacity", source = "trafoCapacityInKva")
