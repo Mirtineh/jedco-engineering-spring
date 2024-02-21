@@ -91,7 +91,13 @@ public class LvDataServiceImpl implements LvDataService {
     public ResponseDto insertLvData(LvDataRegisterRequest lvDataRegisterDto, String username) {
         try {
 //            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
-            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+            Optional<TxInfo> optionalTransformer= txInfoRepository.findById(lvDataRegisterDto.txId());
+            if(optionalTransformer.isEmpty()){
+                return new ResponseDto(false, "Transformer code not found!");
+            }
+            var transformer= optionalTransformer.get();
+//            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
+            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTransformer(lvDataRegisterDto.poleNo(), transformer);
             if (optionalPoleData.isPresent()) {
                 return new ResponseDto(false, "Pole No. Already registered with the same Tx Code.");
             }
@@ -108,14 +114,15 @@ public class LvDataServiceImpl implements LvDataService {
             User user = userRepository.findByUsername(username).get();
 
             PoleData poleData = new PoleData();
-            poleData.setFeeder(lvDataRegisterDto.feeder());
+//            poleData.setFeeder(lvDataRegisterDto.feeder());
             poleData.setAssemblyType(lvDataRegisterDto.assemblyType());
             poleData.setBranchCode(lvDataRegisterDto.branchCode());
             poleData.setConductorType(lvDataRegisterDto.conductorType());
             poleData.setPoleType(lvDataRegisterDto.poleType());
             poleData.setPoleFeature(lvDataRegisterDto.poleFeature());
             poleData.setPoleNo(lvDataRegisterDto.poleNo());
-            poleData.setTxNo(lvDataRegisterDto.txNo());
+//            poleData.setTxNo(lvDataRegisterDto.txNo());
+            poleData.setTransformer(transformer);
             poleData.setRegisteredBy(user);
             poleData.setStatus(status);
             poleData.setLatitude(longLatResponse.latitude());
@@ -188,9 +195,14 @@ public class LvDataServiceImpl implements LvDataService {
     @Override
     public ResponseDto updateLvData(LvDataResponse updateDto, String username) {
         try {
+            Optional<TxInfo> optionalTransformer= txInfoRepository.findById(updateDto.txId());
+            if(optionalTransformer.isEmpty()){
+                return new ResponseDto(false, "Tx No Not Found!");
+            }
+            var transformer = optionalTransformer.get();
             Optional<PoleData> optionalPoleData = poleDataRepository.findById(updateDto.id());
 //            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTxNo(updateDto.poleNo(), updateDto.txNo());
-            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTransformerTrafoCode(updateDto.poleNo(), updateDto.txNo());
+            Optional<PoleData> optionalCheckData = poleDataRepository.findOneByPoleNoAndTransformer(updateDto.poleNo(), transformer);
             if(optionalPoleData.isEmpty()){
                 return new ResponseDto(false, "Pole Not Found");
             }
@@ -220,14 +232,15 @@ public class LvDataServiceImpl implements LvDataService {
 
 
             LongLatResponse longLatResponse= this.utMtoLangLatService.convertUTMToLangLat(updateDto.northing(), updateDto.easting());
-            poleData.setFeeder(updateDto.feeder());
+//            poleData.setFeeder(updateDto.feeder());
             poleData.setAssemblyType(updateDto.assemblyType());
             poleData.setBranchCode(updateDto.branchCode());
             poleData.setConductorType(updateDto.conductorType());
             poleData.setPoleType(updateDto.poleType());
             poleData.setPoleFeature(updateDto.poleFeature());
             poleData.setPoleNo(updateDto.poleNo());
-            poleData.setTxNo(updateDto.txNo());
+//            poleData.setTxNo(updateDto.txNo());
+            poleData.setTransformer(transformer);
             poleData.setStatus(status);
             poleData.setLatitude(longLatResponse.latitude());
             poleData.setLongitude(longLatResponse.longitude());
