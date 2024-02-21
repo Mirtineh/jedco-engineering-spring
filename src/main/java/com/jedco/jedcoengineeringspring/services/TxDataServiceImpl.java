@@ -26,13 +26,15 @@ public class TxDataServiceImpl implements TxDataService {
     private final PoleDataRepository poleDataRepository;
     private final UserRepository userRepository;
     private final BoxNumberRepository boxNumberRepository;
+    private final FeederRepository feederRepository;
 
     private final TxMapper txMapper;
     private final DateConverter dateConverter;
 
     @Override
     public List<String> listFeeder() {
-        return txInfoRepository.findDistinctByFeederCode();
+//        return txInfoRepository.findDistinctByFeederCode();
+        return feederRepository.findAll().stream().map(Feeder::getName).toList();
     }
 
     @Override
