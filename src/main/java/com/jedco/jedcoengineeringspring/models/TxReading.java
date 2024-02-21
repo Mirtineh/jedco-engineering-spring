@@ -27,11 +27,11 @@ public class TxReading extends BaseEntity{
     private User createdBy;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="updated_on", nullable=false, length=23)
+    @Column(name="updated_on", length=23)
     private Date updatedOn;
 
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="updated_by", nullable=false)
+    @JoinColumn(name="updated_by")
     private User updatedBy;
 
     @ManyToOne(fetch=FetchType.LAZY)
