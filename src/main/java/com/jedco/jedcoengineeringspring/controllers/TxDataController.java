@@ -67,10 +67,10 @@ public class TxDataController {
         return ResponseEntity.ok("{\"message\": \"TxReading with LineReadings added successfully\"}");
     }
     @GetMapping("/txReadingByDate")
-    public List<TxReadingResponse> getTxReading(@RequestParam("date") String date){
+    public List<TxReadingResponse> getTxReading(@RequestParam("date") String date,@RequestParam("txId") Long txId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return txDataService.getTxReadingByDate(date,userDetails.getUsername());
+        return txDataService.getTxReadingByDate(date,txId,userDetails.getUsername());
     }
     @PutMapping("/updateTxReading")
     public ResponseDto updateTxReading(@RequestBody TxReadingResponse txReadingUpdateRequest){

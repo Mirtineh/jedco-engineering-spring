@@ -25,7 +25,7 @@ public interface TxDataService {
     CreateBoxNumberResponse createBoxNumber(Long poleId, String username);
 
 
-    List<TxReadingResponse> getTxReadingByDate(String date, String username);
+    List<TxReadingResponse> getTxReadingByDate(String date,Long txId, String username);
 
     ResponseDto updateTxReading(TxReadingResponse txReadingUpdateRequest, String username);
 }

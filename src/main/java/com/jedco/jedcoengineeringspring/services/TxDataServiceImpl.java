@@ -123,10 +123,10 @@ public class TxDataServiceImpl implements TxDataService {
     }
 
     @Override
-    public List<TxReadingResponse> getTxReadingByDate(String date, String username) {
+    public List<TxReadingResponse> getTxReadingByDate(String date,Long txId, String username) {
         User user = userRepository.findByUsername(username).get();
         Day day= dateConverter.convertToStartAndEndDate(date);
-        List<TxReading> txReadingList = txReadingRepository.findAllByCreatedByAndCreatedOnBetween(user,day.startTime(),day.endTime());
+        List<TxReading> txReadingList = txReadingRepository.findAllByCreatedByAndTransformerIdAndCreatedOnBetween(user,txId,day.startTime(),day.endTime());
         return txReadingList.stream().map(txMapper::toTxReadingResponse).toList();
     }
 

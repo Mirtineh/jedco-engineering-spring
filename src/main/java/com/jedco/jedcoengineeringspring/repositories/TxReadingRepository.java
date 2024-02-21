@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface TxReadingRepository extends JpaRepository<TxReading,Long> {
     List<TxReading> findAllByCreatedByAndCreatedOnBetween(User user, Date date, Date date1);
+
+    List<TxReading> findAllByCreatedByAndTransformerIdAndCreatedOnBetween(User user, Long txId, Date date, Date date1);
 }
