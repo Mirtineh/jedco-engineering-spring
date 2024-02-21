@@ -26,6 +26,14 @@ public class TxReading extends BaseEntity{
     @JoinColumn(name="created_by", nullable=false)
     private User createdBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="updated_on", length=23)
+    private Date updatedOn;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="updated_by")
+    private User updatedBy;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="transformer_id", nullable=false)
     private TxInfo transformer;
@@ -42,6 +50,7 @@ public class TxReading extends BaseEntity{
     @OneToMany(fetch=FetchType.EAGER, mappedBy="txReading",cascade = CascadeType.ALL)
     private Set<TxLineReading> lineReadings= new HashSet<>();
     @PrePersist
+    @PreUpdate
     private void computeTransformerLoading() {
         double totalLineReadingPower = 0.0;
         // Calculate the total power of all TxLineReading instances

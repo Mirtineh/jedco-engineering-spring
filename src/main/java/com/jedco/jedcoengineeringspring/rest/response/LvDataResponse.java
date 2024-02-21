@@ -4,6 +4,7 @@ import java.util.List;
 
 public record LvDataResponse(
         Long id,
+        Long txId,
         String feeder,
         String txNo,
         String branchCode,

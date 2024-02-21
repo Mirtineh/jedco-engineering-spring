@@ -1,10 +1,7 @@
 package com.jedco.jedcoengineeringspring.services;
 
 import com.jedco.jedcoengineeringspring.rest.request.TxReadingRequest;
-import com.jedco.jedcoengineeringspring.rest.response.CreateBoxNumberResponse;
-import com.jedco.jedcoengineeringspring.rest.response.PoleResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TransformerResponse;
-import com.jedco.jedcoengineeringspring.rest.response.TxResponse;
+import com.jedco.jedcoengineeringspring.rest.response.*;
 
 import java.util.List;
 
@@ -28,4 +25,7 @@ public interface TxDataService {
     CreateBoxNumberResponse createBoxNumber(Long poleId, String username);
 
 
+    List<TxReadingResponse> getTxReadingByDate(String date,Long txId, String username);
+
+    ResponseDto updateTxReading(TxReadingResponse txReadingUpdateRequest, String username);
 }

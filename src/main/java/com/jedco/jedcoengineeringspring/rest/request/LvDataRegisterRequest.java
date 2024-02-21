@@ -3,8 +3,7 @@ package com.jedco.jedcoengineeringspring.rest.request;
 import java.util.List;
 
 public record LvDataRegisterRequest(
-        String feeder,
-        String txNo,
+        Long txId,
         String branchCode,
         String poleNo,
         String assemblyType,
