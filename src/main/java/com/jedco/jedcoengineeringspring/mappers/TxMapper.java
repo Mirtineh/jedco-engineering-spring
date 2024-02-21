@@ -2,8 +2,10 @@ package com.jedco.jedcoengineeringspring.mappers;
 
 import com.jedco.jedcoengineeringspring.models.PoleData;
 import com.jedco.jedcoengineeringspring.models.TxInfo;
+import com.jedco.jedcoengineeringspring.models.TxReading;
 import com.jedco.jedcoengineeringspring.rest.response.PoleResponse;
 import com.jedco.jedcoengineeringspring.rest.response.TransformerResponse;
+import com.jedco.jedcoengineeringspring.rest.response.TxReadingResponse;
 import com.jedco.jedcoengineeringspring.rest.response.TxResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +22,7 @@ public interface TxMapper {
     @Mapping(target = "mvPoleCode", source = "mvPoleCodeNearToTrafo")
     @Mapping(target = "feeder", source = "feederCode")
     TransformerResponse toTransformerResponse(TxInfo txInfo);
+
+    TxReadingResponse toTxReadingResponse(TxReading txReading);
+
 }
