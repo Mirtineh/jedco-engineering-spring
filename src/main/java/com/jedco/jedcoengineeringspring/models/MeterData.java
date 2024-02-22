@@ -47,6 +47,9 @@ public class MeterData extends BaseEntity {
     @Column(name="meter_reg_type", length=100)
     private String meterRegType;
 
+    @Column(name="ct_ratio", length=100)
+    private String ctRatio;
+
     @Column(name="box_no", length=100)
     private String boxNo;
 
@@ -60,8 +63,16 @@ public class MeterData extends BaseEntity {
     @Column(name="registered_by", length=100)
     private Long registeredBy;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="updated_on", length=23)
+    private Date updatedOn;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "box_no_id", nullable = false)
+    @JoinColumn(name = "updated_by")
+    private User updatedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY,optional=true, cascade=CascadeType.ALL)
+    @JoinColumn(name = "box_no_id")
     private BoxNumber boxNumber;
 
     @ManyToOne(fetch= FetchType.LAZY)

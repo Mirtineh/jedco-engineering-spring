@@ -13,6 +13,7 @@ public record LvMeterDataRequest(
         String meterAnomaly,
         String boxNo,
         String assemblyType,
+        String ctRatio,
         Long boxNoId
 ) {
 }

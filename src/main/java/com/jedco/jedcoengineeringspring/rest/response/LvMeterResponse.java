@@ -13,6 +13,7 @@ public record LvMeterResponse(
         String serviceCableType,
         String meterAnomaly,
         String assemblyType,
+        String ctRatio,
         Long boxNoId
 ) {
 }
