@@ -2,6 +2,7 @@ package com.jedco.jedcoengineeringspring.services;
 
 import com.jedco.jedcoengineeringspring.Util.DateConverter;
 import com.jedco.jedcoengineeringspring.Util.Day;
+import com.jedco.jedcoengineeringspring.exceptions.ResponseException;
 import com.jedco.jedcoengineeringspring.mappers.PoleDataMapper;
 import com.jedco.jedcoengineeringspring.models.*;
 import com.jedco.jedcoengineeringspring.repositories.*;
@@ -16,10 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -77,7 +75,7 @@ public class LvDataServiceImpl implements LvDataService {
     @Override
     public List<LvDataResponse> getDataByFeederTxPole(String feeder, String txCode, String poleNo) {
 //        List<PoleData> poleDataList= poleDataRepository.findByFeederAndTxNoAndPoleNo(feeder,txCode,poleNo);
-        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(feeder,txCode,poleNo);
+        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(txCode,feeder,poleNo);
         return getLvDataResponses(poleDataList);
     }
 
@@ -88,6 +86,7 @@ public class LvDataServiceImpl implements LvDataService {
     }
 
     @Override
+    @Transactional
     public ResponseDto insertLvData(LvDataRegisterRequest lvDataRegisterDto, String username) {
         try {
 //            Optional<PoleData> optionalPoleData = poleDataRepository.findOneByPoleNoAndTxNo(lvDataRegisterDto.poleNo(), lvDataRegisterDto.txNo());
@@ -137,13 +136,17 @@ public class LvDataServiceImpl implements LvDataService {
             poleData.setUpdatedOn(new Date());
             poleData.setUpdatedBy(user.getFirstName()+" "+user.getLastName());
             poleDataRepository.save(poleData);
-            BoxNumber boxNumber=new BoxNumber();
-            Date boxNumberDate= new Date();
-            boxNumber.setCreatedBy(user);
-            boxNumber.setCreatedOn(boxNumberDate);
-            boxNumber.setUpdatedOn(boxNumberDate);
-            boxNumber.setPoleData(poleData);
-            createBoxNumber(poleData,boxNumber);
+            BoxNumber boxNumber=null;
+
+            if(!Objects.equals(lvDataRegisterDto.poleType(), "MV EXTENSION")){
+                boxNumber=new BoxNumber();
+                Date boxNumberDate= new Date();
+                boxNumber.setCreatedBy(user);
+                boxNumber.setCreatedOn(boxNumberDate);
+                boxNumber.setUpdatedOn(boxNumberDate);
+                boxNumber.setPoleData(poleData);
+                createBoxNumber(poleData,boxNumber);
+            }
 
             for (LvMeterDataRequest meter : lvDataRegisterDto.meterDataDtoList()) {
                 MeterData meterData = new MeterData();
@@ -165,19 +168,24 @@ public class LvDataServiceImpl implements LvDataService {
                 meterData.setRegisteredOn(new Date());
                 meterData.setBoxAssemblyType(meter.assemblyType());
                 meterData.setMeterRegType("COMMISSIONING");
+                meterData.setCtRatio(meter.ctRatio());
                 meterData.setBoxNumber(boxNumber);
                 meterDataRepository.save(meterData);
 
             }
 
             return new ResponseDto(true, "Lv Network data Registered Successfully");
-        } catch (Exception ex) {
+        }
+        catch (ResponseException ex){
+            return new ResponseDto(false,ex.getMessage());
+        }
+        catch (Exception ex) {
             log.error("Lv Pole data registeration failed..."+ex.getMessage());
             return new ResponseDto(false, "Lv Network data Registration Failed!");
 
         }
     }
-    @Transactional
+//    @Transactional
     protected Long createBoxNumber(PoleData poleData,BoxNumber boxNumber){
         Optional<TxInfo> optionalTransformer=txInfoRepository.findByTrafoCode(poleData.getTxNo());
         if(optionalTransformer.isEmpty()){
@@ -193,6 +201,7 @@ public class LvDataServiceImpl implements LvDataService {
     }
 
     @Override
+    @Transactional
     public ResponseDto updateLvData(LvDataResponse updateDto, String username) {
         try {
             Optional<TxInfo> optionalTransformer= txInfoRepository.findById(updateDto.txId());
@@ -216,10 +225,15 @@ public class LvDataServiceImpl implements LvDataService {
             Long deletedStatus= 3L;
 
             for (LvMeterResponse meter : updateDto.meterDataDtoList()) {
+                MeterData meterData = meterDataRepository.findOneByMeterNoAndStatusId(meter.meterNo(),activeStatus);
                 if(meter.id()==null){
-                    MeterData meterData = meterDataRepository.findOneByMeterNoAndStatusId(meter.meterNo(),activeStatus);
                     if(meterData!=null){
                         return new ResponseDto(false, "Meter No. "+meter.meterNo()+" Already registered in the system");
+                    }
+                }
+                else{
+                    if(meterData!=null && !meterData.getId().equals(meter.id())){
+                        return new ResponseDto(false,"Meter No. "+meter.meterNo()+" Already registered in the system");
                     }
                 }
 
@@ -266,8 +280,13 @@ public class LvDataServiceImpl implements LvDataService {
                 if(meter.id()!=null){
                     //TODO check for side effects
                     meterData = meterDataRepository.findById(meter.id()).get();
-                    poleUpdateData(poleData, status, meter, meterData);
-                    meterDataRepository.save(meterData);
+                    if (!checkIfEqual(meterData, meter)) {
+                        poleUpdateData(poleData, status, meter, meterData);
+                        meterData.setUpdatedBy(user);
+                        meterData.setUpdatedOn(new Date());
+                        meterDataRepository.save(meterData);
+                    }
+
                 }else{
                     meterData  = new MeterData();
                     poleUpdateData(poleData, status, meter, meterData);
@@ -285,12 +304,36 @@ public class LvDataServiceImpl implements LvDataService {
 //            this.updateHistoryDao.create(updateHistory);
 
             return new ResponseDto(true, "Lv Network data Registered Successfully");
-        } catch (Exception ex) {
+
+        }
+        catch (Exception ex) {
             log.error("Lv Pole data update failed..."+ex.getMessage());
             return new ResponseDto(false, "Lv Network data Registration Failed!");
 
         }
     }
+
+    private boolean checkIfEqual(MeterData meterData, LvMeterResponse meter) {
+        // Check if any of the fields is different
+        if (!Objects.equals(meterData.getComCableLength(), meter.comCableLength())) return false;
+        if (!Objects.equals(meterData.getConnectedPhase(), meter.connectedPhase())) return false;
+        if (!Objects.equals(meterData.getCustomerName(), meter.customerName())) return false;
+        if (!Objects.equals(meterData.getMeterNo(), meter.meterNo())) return false;
+        if (!Objects.equals(meterData.getCustomerType(), meter.customerType())) return false;
+        if (!Objects.equals(meterData.getEstimatedLoad(), meter.estimatedLoad())) return false;
+        if (!Objects.equals(meterData.getMeterType(), meter.meterType())) return false;
+        if (!Objects.equals(meterData.getServiceCableLength(), meter.serviceCableLength())) return false;
+        if (!Objects.equals(meterData.getServiceCableType(), meter.serviceCableType())) return false;
+        if (!Objects.equals(meterData.getMeterAnomaly(), meter.meterAnomaly())) return false;
+        if (!Objects.equals(meterData.getBoxNumber(), boxNumberRepository.findById(meter.boxNoId()).orElse(null))) return false;
+        if (!Objects.equals(meterData.getBoxAssemblyType(), meter.assemblyType())) return false;
+        if (!Objects.equals(meterData.getCtRatio(), meter.ctRatio())) return false;
+
+        // All fields are equal
+        return true;
+
+    }
+
     private void poleUpdateData(PoleData poleData, Status status, LvMeterResponse meter, MeterData meterData) {
         meterData.setComCableLength(meter.comCableLength());
         meterData.setConnectedPhase(meter.connectedPhase());
@@ -304,7 +347,10 @@ public class LvDataServiceImpl implements LvDataService {
         meterData.setPoleData(poleData);
         meterData.setStatus(status);
         meterData.setMeterAnomaly(meter.meterAnomaly());
-        meterData.setBoxNumber(boxNumberRepository.findById(meter.boxNoId()).get());
+        if(meter.boxNoId()!=null) {
+            meterData.setBoxNumber(boxNumberRepository.findById(meter.boxNoId()).get());
+        }
         meterData.setBoxAssemblyType(meter.assemblyType());
+        meterData.setCtRatio(meter.ctRatio());
     }
 }
