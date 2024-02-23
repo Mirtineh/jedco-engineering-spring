@@ -138,14 +138,8 @@ public class LvDataServiceImpl implements LvDataService {
             poleDataRepository.save(poleData);
             BoxNumber boxNumber=null;
 
-            if(!Objects.equals(lvDataRegisterDto.poleType(), "MV EXTENSION")){
-                boxNumber=new BoxNumber();
-                Date boxNumberDate= new Date();
-                boxNumber.setCreatedBy(user);
-                boxNumber.setCreatedOn(boxNumberDate);
-                boxNumber.setUpdatedOn(boxNumberDate);
-                boxNumber.setPoleData(poleData);
-                createBoxNumber(poleData,boxNumber);
+            if(!Objects.equals(lvDataRegisterDto.poleRegisterationType(), "MV EXTENSION")){
+                boxNumber = getBoxNumber(user, poleData);
             }
 
             for (LvMeterDataRequest meter : lvDataRegisterDto.meterDataDtoList()) {
@@ -169,15 +163,17 @@ public class LvDataServiceImpl implements LvDataService {
                 meterData.setBoxAssemblyType(meter.assemblyType());
                 meterData.setMeterRegType("COMMISSIONING");
                 meterData.setCtRatio(meter.ctRatio());
-                meterData.setBoxNumber(boxNumber);
+                if(!Objects.equals(meter.meterType(), "High Current")){
+                    if(boxNumber==null){
+                        boxNumber=getBoxNumber(user,poleData);
+                    }
+                    meterData.setBoxNumber(boxNumber);
+                }
                 meterDataRepository.save(meterData);
 
             }
 
             return new ResponseDto(true, "Lv Network data Registered Successfully");
-        }
-        catch (ResponseException ex){
-            return new ResponseDto(false,ex.getMessage());
         }
         catch (Exception ex) {
             log.error("Lv Pole data registeration failed..."+ex.getMessage());
@@ -185,19 +181,27 @@ public class LvDataServiceImpl implements LvDataService {
 
         }
     }
-//    @Transactional
-    protected Long createBoxNumber(PoleData poleData,BoxNumber boxNumber){
-        Optional<TxInfo> optionalTransformer=txInfoRepository.findByTrafoCode(poleData.getTxNo());
-        if(optionalTransformer.isEmpty()){
-            return 0L;
-        }
-        var transformer= optionalTransformer.get();
+
+    private BoxNumber getBoxNumber(User user, PoleData poleData) {
+        BoxNumber boxNumber;
+        BoxNumber box=new BoxNumber();
+        Date boxNumberDate= new Date();
+        box.setCreatedBy(user);
+        box.setCreatedOn(boxNumberDate);
+        box.setUpdatedOn(boxNumberDate);
+        box.setPoleData(poleData);
+        boxNumber=createBoxNumber(poleData,box);
+        return boxNumber;
+    }
+
+    //    @Transactional
+    protected BoxNumber createBoxNumber(PoleData poleData,BoxNumber boxNumber){
+        var transformer= poleData.getTransformer();
         Long newSequence = transformer.getBoxSequence() + 1;
         transformer.setBoxSequence(newSequence);
         txInfoRepository.save(transformer);
         boxNumber.setBoxNumber(newSequence);
-        boxNumberRepository.save(boxNumber);
-        return newSequence;
+        return boxNumberRepository.save(boxNumber);
     }
 
     @Override
@@ -325,7 +329,8 @@ public class LvDataServiceImpl implements LvDataService {
         if (!Objects.equals(meterData.getServiceCableLength(), meter.serviceCableLength())) return false;
         if (!Objects.equals(meterData.getServiceCableType(), meter.serviceCableType())) return false;
         if (!Objects.equals(meterData.getMeterAnomaly(), meter.meterAnomaly())) return false;
-        if (!Objects.equals(meterData.getBoxNumber(), boxNumberRepository.findById(meter.boxNoId()).orElse(null))) return false;
+        BoxNumber meterBoxNumber = meter.boxNoId() != null ? boxNumberRepository.findById(meter.boxNoId()).orElse(null) : null;
+        if (!Objects.equals(meterData.getBoxNumber(), meterBoxNumber)) return false;
         if (!Objects.equals(meterData.getBoxAssemblyType(), meter.assemblyType())) return false;
         if (!Objects.equals(meterData.getCtRatio(), meter.ctRatio())) return false;
 
