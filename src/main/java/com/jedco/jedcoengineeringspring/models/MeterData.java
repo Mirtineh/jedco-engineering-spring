@@ -71,7 +71,7 @@ public class MeterData extends BaseEntity {
     @JoinColumn(name = "updated_by")
     private User updatedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional=true, cascade=CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "box_no_id")
     private BoxNumber boxNumber;
 
