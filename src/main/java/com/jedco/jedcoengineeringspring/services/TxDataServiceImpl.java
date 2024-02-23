@@ -168,11 +168,7 @@ public class TxDataServiceImpl implements TxDataService {
 
     //TODO Check this method carefully
     private Long createBoxNumber(PoleData poleData, BoxNumber boxNumber) {
-        Optional<TxInfo> optionaltransformer = txInfoRepository.findByTrafoCode(poleData.getTxNo());
-        if (optionaltransformer.isEmpty()) {
-            return 0L;
-        }
-        var transformer = optionaltransformer.get();
+        var transformer = poleData.getTransformer();
         Long newSequence = transformer.getBoxSequence() + 1;
         transformer.setBoxSequence(newSequence);
         txInfoRepository.save(transformer);
