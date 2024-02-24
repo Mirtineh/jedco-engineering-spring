@@ -286,6 +286,9 @@ public class LvDataServiceImpl implements LvDataService {
                     meterData = meterDataRepository.findById(meter.id()).get();
                     if (!checkIfEqual(meterData, meter)) {
                         poleUpdateData(poleData, status, meter, meterData);
+                        if(Objects.equals(meter.meterType(), "High Current")){
+                            meterData.setBoxNumber(null);
+                        }
                         meterData.setUpdatedBy(user);
                         meterData.setUpdatedOn(new Date());
                         meterDataRepository.save(meterData);
