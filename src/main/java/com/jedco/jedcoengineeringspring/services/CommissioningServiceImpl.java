@@ -1,5 +1,6 @@
 package com.jedco.jedcoengineeringspring.services;
 
+import com.jedco.jedcoengineeringspring.config.MeterHistoryType;
 import com.jedco.jedcoengineeringspring.mappers.BoxNumberMapper;
 import com.jedco.jedcoengineeringspring.mappers.PoleDataMapper;
 import com.jedco.jedcoengineeringspring.models.*;
@@ -25,6 +26,7 @@ public class CommissioningServiceImpl implements CommissioningService {
     private final UserRepository userRepository;
     private final BoxNumberRepository boxNumberRepository;
     private final TxInfoRepository txInfoRepository;
+    private final MeterHistoryRepository meterHistoryRepository;
 
     private final PoleDataMapper poleDataMapper;
     private final BoxNumberMapper boxNumberMapper;
@@ -235,6 +237,7 @@ public class CommissioningServiceImpl implements CommissioningService {
 
 
             MeterData meterData = new MeterData();
+            Date registeredOn= new Date();
 
             meterData.setComCableLength(meter.getComCableLength());
             meterData.setConnectedPhase(meter.getConnectedPhase());
@@ -250,10 +253,19 @@ public class CommissioningServiceImpl implements CommissioningService {
             meterData.setMeterAnomaly(meter.getMeterAnomaly());
             meterData.setRegisteredBy(user.getId());
             meterData.setMeterRegType("METER CHANGE");
-            meterData.setRegisteredOn(new Date());
+            meterData.setRegisteredOn(registeredOn);
             meterData.setBoxAssemblyType(meter.getBoxAssemblyType());
             meterData.setBoxNumber(meter.getBoxNumber());
             meterDataRepository.save(meterData);
+
+            MeterHistory history= new MeterHistory();
+            history.setMeterHistoryType(MeterHistoryType.METER_CHANGE);
+            history.setRegisteredOn(registeredOn);
+            history.setCreatedBy(user);
+            history.setMeter(meterData);
+            history.setOldMeter(meter);
+            meterHistoryRepository.save(history);
+
 
             return new ResponseDto(true, "Meter Change done successfully!");
         } catch (Exception ex) {
@@ -291,6 +303,8 @@ public class CommissioningServiceImpl implements CommissioningService {
 
 
             MeterData meterData = new MeterData();
+            Date registeredOn = new Date();
+
 
             meterData.setComCableLength(meter.getComCableLength());
             meterData.setConnectedPhase(meter.getConnectedPhase());
@@ -306,10 +320,19 @@ public class CommissioningServiceImpl implements CommissioningService {
             meterData.setMeterAnomaly(meter.getMeterAnomaly());
             meterData.setRegisteredBy(user.getId());
             meterData.setMeterRegType("METER RELOCATION");
-            meterData.setRegisteredOn(new Date());
+            meterData.setRegisteredOn(registeredOn);
             meterData.setBoxAssemblyType(meter.getBoxAssemblyType());
             meterData.setBoxNumber(destBoxNumber);
             meterDataRepository.save(meterData);
+
+            MeterHistory history= new MeterHistory();
+            history.setMeterHistoryType(MeterHistoryType.METER_RELOCATION);
+            history.setRegisteredOn(registeredOn);
+            history.setCreatedBy(user);
+            history.setMeter(meterData);
+            history.setOldMeter(meter);
+            history.setOldPole(meter.getPoleData());
+            meterHistoryRepository.save(history);
 
             return new ResponseDto(true, "Meter Relocation done successfully!");
         } catch (Exception ex) {
