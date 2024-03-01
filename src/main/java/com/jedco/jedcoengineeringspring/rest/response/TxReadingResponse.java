@@ -1,6 +1,7 @@
 package com.jedco.jedcoengineeringspring.rest.response;
 
 
+import java.util.Date;
 import java.util.List;
 
 public record TxReadingResponse(
@@ -8,7 +9,8 @@ public record TxReadingResponse(
         List<TxLineReadingResponse> lineReadings,
         String branch,
         Double neutralCurrent,
-        String remark
+        String remark,
+        Date date
 
 ) {
 }

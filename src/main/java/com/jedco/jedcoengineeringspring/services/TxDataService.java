@@ -28,4 +28,6 @@ public interface TxDataService {
     List<TxReadingResponse> getTxReadingByDate(String date,Long txId, String username);
 
     ResponseDto updateTxReading(TxReadingResponse txReadingUpdateRequest, String username);
+
+    List<String> listCtRatio();
 }

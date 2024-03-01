@@ -23,6 +23,7 @@ public interface TxMapper {
     @Mapping(target = "feeder", source = "feederCode")
     TransformerResponse toTransformerResponse(TxInfo txInfo);
 
+    @Mapping(target = "date", source = "createdOn")
     TxReadingResponse toTxReadingResponse(TxReading txReading);
 
 }
