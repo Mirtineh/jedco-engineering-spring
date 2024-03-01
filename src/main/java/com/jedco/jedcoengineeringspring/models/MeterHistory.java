@@ -16,15 +16,15 @@ import java.util.Date;
 @Table(name = "meter_history")
 public class MeterHistory extends BaseEntity{
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private MeterHistoryType meterHistoryType;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="date", length=23)
+    @Column(name="date", length=23,nullable = false)
     private Date registeredOn;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by",nullable = false)
     private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
