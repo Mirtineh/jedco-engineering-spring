@@ -28,6 +28,9 @@ public class TxDataController {
         return this.txDataService.listFeeder();
     }
 
+    @GetMapping("/ctRatioList")
+    public List<String> listCtRatio(){return this.txDataService.listCtRatio();}
+
     @GetMapping("/txList")
     public List<TxResponse> listTx(@RequestParam("feeder") String feeder) {
         return this.txDataService.listTxByFeeder(feeder);

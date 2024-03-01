@@ -10,6 +10,10 @@ import com.jedco.jedcoengineeringspring.rest.request.TxReadingRequest;
 import com.jedco.jedcoengineeringspring.rest.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -24,6 +28,7 @@ public class TxDataServiceImpl implements TxDataService {
     private final UserRepository userRepository;
     private final BoxNumberRepository boxNumberRepository;
     private final FeederRepository feederRepository;
+    private final CtRatioRepository ctRatioRepository;
     private final TxLineReadingRepository txLineReadingRepository;
 
     private final TxMapper txMapper;
@@ -126,7 +131,11 @@ public class TxDataServiceImpl implements TxDataService {
     public List<TxReadingResponse> getTxReadingByDate(String date,Long txId, String username) {
         User user = userRepository.findByUsername(username).get();
         Day day= dateConverter.convertToStartAndEndDate(date);
-        List<TxReading> txReadingList = txReadingRepository.findAllByCreatedByAndTransformerIdAndCreatedOnBetween(user,txId,day.startTime(),day.endTime());
+        // Set the number of latest records you want to fetch
+        int numberOfLatestRecords = Integer.MAX_VALUE; // Adjust as needed
+
+        Pageable pageable = PageRequest.of(0, numberOfLatestRecords, Sort.by(Sort.Direction.DESC, "createdOn"));
+        List<TxReading> txReadingList = txReadingRepository.findAllByCreatedByAndTransformerIdAndCreatedOnBetween(user,txId,day.startTime(),day.endTime(),pageable);
         return txReadingList.stream().map(txMapper::toTxReadingResponse).toList();
     }
 
@@ -164,6 +173,11 @@ public class TxDataServiceImpl implements TxDataService {
         txReading.setUpdatedBy(user);
         txReadingRepository.save(txReading);
         return new ResponseDto(true,"Reading Updated Successfully!");
+    }
+
+    @Override
+    public List<String> listCtRatio() {
+        return ctRatioRepository.findAll().stream().map(CtRatio::getName).toList();
     }
 
     //TODO Check this method carefully
