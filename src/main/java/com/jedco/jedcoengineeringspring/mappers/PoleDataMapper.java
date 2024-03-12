@@ -12,9 +12,11 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface PoleDataMapper {
 
+    @Mapping(target = "boxNo", source = "meterData.boxNumber.formattedBoxNumber")
     @Mapping(target = "feeder", source = "poleData.transformer.feederCode")
     @Mapping(target = "txNo", source = "poleData.transformer.trafoCode")
-    LvPoleResponse toPoleResponse(PoleData poleData);
+    @Mapping(target = "id", source = "poleData.id")
+    LvPoleResponse toPoleResponse(PoleData poleData,MeterData meterData);
 
     @Mapping(target = "txId", source = "poleData.transformer.id")
     @Mapping(target = "poleRegistrationType", source = "poleData.poleRegType")

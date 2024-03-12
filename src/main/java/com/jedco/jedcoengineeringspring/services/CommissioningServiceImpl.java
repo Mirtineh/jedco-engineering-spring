@@ -41,8 +41,9 @@ public class CommissioningServiceImpl implements CommissioningService {
         } else if (meters.size() > 1) {
             return new RefResponse(false, "Reference Meter is not unique!", null);
         } else {
-            PoleData poleData = meters.get(0).getPoleData();
-            LvPoleResponse poleResponseDto = poleDataMapper.toPoleResponse(poleData);
+            MeterData meterData= meters.get(0);
+            PoleData poleData = meterData.getPoleData();
+            LvPoleResponse poleResponseDto = poleDataMapper.toPoleResponse(poleData,meterData);
             return new RefResponse(true, "Reference Pole Data Found!", poleResponseDto);
         }
     }
