@@ -96,4 +96,9 @@ public class CommissioningController {
     public List<BoxNumberResponse> getBoxNumbers(@PathVariable("poleId") Long poleId) {
         return this.lvCommissioningService.getBoxNumbers(poleId);
     }
+
+    @GetMapping("/getPoleBoxNumbers/{poleId}")
+    public List<BoxNumberResponse> getPoleBoxNumbers(@PathVariable("poleId") Long poleId) {
+        return this.lvCommissioningService.getBoxNumbers(poleId);
+    }
 }
