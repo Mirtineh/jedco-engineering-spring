@@ -29,4 +29,14 @@ public interface PoleDataRepository extends JpaRepository<PoleData,Long> {
     Optional<PoleData> findOneByPoleNoAndTransformerTrafoCode(String s, String s1);
 
     Optional<PoleData> findOneByPoleNoAndTransformer(String s, TxInfo transformer);
+
+    List<PoleData> findAllBySubmittedOnBetweenAndStatusId(Date date, Date date1, Long activeStatus);
+
+    List<PoleData> findAllByRegisteredByAndSubmittedOnBetweenAndStatusId(User user, Date date, Date date1, Long activeStatus);
+
+    List<PoleData> findAllByTransformerTrafoCodeAndTransformerFeederCodeAndStatusId(String txCode, String feeder, Long activeStatus);
+
+    List<PoleData> findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNoAndStatusId(String txCode, String feeder, String poleNo, Long activeStatus);
+
+    List<PoleData> findByPoleNoAndStatusId(String poleNo, Long activeStatus);
 }

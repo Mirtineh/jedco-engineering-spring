@@ -2,7 +2,6 @@ package com.jedco.jedcoengineeringspring.services;
 
 import com.jedco.jedcoengineeringspring.Util.DateConverter;
 import com.jedco.jedcoengineeringspring.Util.Day;
-import com.jedco.jedcoengineeringspring.exceptions.ResponseException;
 import com.jedco.jedcoengineeringspring.mappers.PoleDataMapper;
 import com.jedco.jedcoengineeringspring.models.*;
 import com.jedco.jedcoengineeringspring.repositories.*;
@@ -47,11 +46,14 @@ public class LvDataServiceImpl implements LvDataService {
     public List<LvDataResponse> getDataByUser(String date, String username) {
         Day day= dateConverter.convertToStartAndEndDate(date);
         User user = userRepository.findByUsername(username).get();
+        Long activeStatus = 1L;
         List<PoleData>  poleDataList;
         if(username.equals("abe")){
-            poleDataList= poleDataRepository.findAllBySubmittedOnBetween(day.startTime(),day.endTime());
+//            poleDataList= poleDataRepository.findAllBySubmittedOnBetween(day.startTime(),day.endTime());
+            poleDataList= poleDataRepository.findAllBySubmittedOnBetweenAndStatusId(day.startTime(),day.endTime(),activeStatus);
         }else{
-            poleDataList= poleDataRepository.findAllByRegisteredByAndSubmittedOnBetween(user, day.startTime(), day.endTime());
+//            poleDataList= poleDataRepository.findAllByRegisteredByAndSubmittedOnBetween(user, day.startTime(), day.endTime());
+            poleDataList= poleDataRepository.findAllByRegisteredByAndSubmittedOnBetweenAndStatusId(user, day.startTime(), day.endTime(),activeStatus);
         }
         return getLvDataResponses(poleDataList);
 
@@ -60,7 +62,9 @@ public class LvDataServiceImpl implements LvDataService {
     @Override
     public List<LvDataResponse> getDataByFeederAndTx(String feeder, String txCode) {
 //        List<PoleData> poleDataList= poleDataRepository.findAllByFeederAndTxNo(feeder,txCode);
-        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCode(txCode,feeder);
+        Long activeStatus = 1L;
+//        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCode(txCode,feeder);
+        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndStatusId(txCode,feeder,activeStatus);
         return getLvDataResponses(poleDataList);
     }
 
@@ -75,13 +79,17 @@ public class LvDataServiceImpl implements LvDataService {
     @Override
     public List<LvDataResponse> getDataByFeederTxPole(String feeder, String txCode, String poleNo) {
 //        List<PoleData> poleDataList= poleDataRepository.findByFeederAndTxNoAndPoleNo(feeder,txCode,poleNo);
-        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(txCode,feeder,poleNo);
+        Long activeStatus = 1L;
+//        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNo(txCode,feeder,poleNo);
+        List<PoleData> poleDataList= poleDataRepository.findAllByTransformerTrafoCodeAndTransformerFeederCodeAndPoleNoAndStatusId(txCode,feeder,poleNo,activeStatus);
         return getLvDataResponses(poleDataList);
     }
 
     @Override
     public List<LvDataResponse> getDataByPoleNo(String poleNo) {
-        List<PoleData> poleDataList= poleDataRepository.findByPoleNo(poleNo);
+        Long activeStatus = 1L;
+//        List<PoleData> poleDataList= poleDataRepository.findByPoleNo(poleNo);
+        List<PoleData> poleDataList= poleDataRepository.findByPoleNoAndStatusId(poleNo,activeStatus);
         return getLvDataResponses(poleDataList);
     }
 

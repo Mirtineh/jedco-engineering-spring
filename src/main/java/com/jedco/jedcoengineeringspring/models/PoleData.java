@@ -17,7 +17,7 @@ import java.util.Set;
 public class PoleData extends BaseEntity{
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="pole_status", nullable=false)
-    private Status Status;
+    private Status status;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="reg_by", nullable=false)
