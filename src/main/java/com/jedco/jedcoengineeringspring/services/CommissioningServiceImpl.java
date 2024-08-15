@@ -227,9 +227,9 @@ public class CommissioningServiceImpl implements CommissioningService {
             Long activeStatus = 1L;
             List<MeterData> chkMeter = meterDataRepository.findAllByMeterNoAndStatusId(oldMeter, activeStatus);
             if (chkMeter.isEmpty()) {
-                return new ResponseDto(true, "Old Meter Not Found in the system");
+                return new ResponseDto(false, "Old Meter Not Found in the system");
             } else if (chkMeter.size() > 1) {
-                return new ResponseDto(true, "Old Meter Not Unique in the system");
+                return new ResponseDto(false, "Old Meter Not Unique in the system");
             }
             MeterData meter = chkMeter.get(0);
             Long reversedStatus = 7L;
