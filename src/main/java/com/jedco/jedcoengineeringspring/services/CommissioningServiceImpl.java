@@ -124,6 +124,8 @@ public class CommissioningServiceImpl implements CommissioningService {
                 meterData.setPoleData(poleData);
                 meterData.setStatus(status);
                 meterData.setMeterAnomaly(meter.meterAnomaly());
+                meterData.setMeterBreakerSize(meter.meterBreakerSize());
+                meterData.setCustomerSideBreakerSize(meter.customerSideBreakerSize());
                 meterData.setRegisteredBy(user.getId());
                 meterData.setMeterRegType("COMMISSIONING");
                 meterData.setBoxNo(meter.boxNo());
