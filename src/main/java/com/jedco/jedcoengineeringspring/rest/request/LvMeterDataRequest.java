@@ -14,6 +14,8 @@ public record LvMeterDataRequest(
         String boxNo,
         String assemblyType,
         String ctRatio,
+        String meterBreakerSize,
+        String customerSideBreakerSize,
         Long boxNoId
 ) {
 }

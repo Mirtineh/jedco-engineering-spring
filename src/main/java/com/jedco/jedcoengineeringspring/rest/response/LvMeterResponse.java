@@ -14,6 +14,8 @@ public record LvMeterResponse(
         String meterAnomaly,
         String assemblyType,
         String ctRatio,
+        String meterBreakerSize,
+        String customerSideBreakerSize,
         Long boxNoId
 ) {
 }
