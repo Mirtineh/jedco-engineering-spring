@@ -22,8 +22,12 @@ import java.util.function.Function;
 public class JwtServiceImpl implements JwtService {
     @Value("${token.signing.key}")
     private String jwtSigningKey;
-    @Value("${token.expiration.days}")
-    private int tokenExpirationDays;
+//    @Value("${token.expiration.days}")
+//    private int tokenExpirationDays;
+
+    @Value("${token.expiration.years}")
+    private int tokenExpirationYears;
+
     @Value("${refresh.token.expiration.days}") // Add a property for refresh token expiration
     private int refreshTokenExpirationDays;
 
@@ -51,7 +55,8 @@ public class JwtServiceImpl implements JwtService {
     private String generateToken(Map<String, Object> extraClaims, User userDetails) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.DAY_OF_WEEK, tokenExpirationDays);
+//        calendar.add(Calendar.DAY_OF_WEEK, tokenExpirationDays);
+        calendar.add(Calendar.YEAR, tokenExpirationYears);
         Date expirationDate = calendar.getTime();
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
