@@ -166,6 +166,8 @@ public class LvDataServiceImpl implements LvDataService {
                 meterData.setStatus(status);
                 meterData.setMeterAnomaly(meter.meterAnomaly());
                 meterData.setBoxAssemblyType(meter.assemblyType());
+                meterData.setMeterBreakerSize(meter.meterBreakerSize());
+                meterData.setCustomerSideBreakerSize(meter.customerSideBreakerSize());
                 meterData.setRegisteredBy(user.getId());
                 meterData.setRegisteredOn(new Date());
                 meterData.setBoxAssemblyType(meter.assemblyType());
@@ -339,6 +341,8 @@ public class LvDataServiceImpl implements LvDataService {
         if (!Objects.equals(meterData.getMeterType(), meter.meterType())) return false;
         if (!Objects.equals(meterData.getServiceCableLength(), meter.serviceCableLength())) return false;
         if (!Objects.equals(meterData.getServiceCableType(), meter.serviceCableType())) return false;
+        if (!Objects.equals(meterData.getMeterBreakerSize(), meter.meterBreakerSize())) return false;
+        if (!Objects.equals(meterData.getCustomerSideBreakerSize(), meter.customerSideBreakerSize())) return false;
         if (!Objects.equals(meterData.getMeterAnomaly(), meter.meterAnomaly())) return false;
         BoxNumber meterBoxNumber = meter.boxNoId() != null ? boxNumberRepository.findById(meter.boxNoId()).orElse(null) : null;
         if (!Objects.equals(meterData.getBoxNumber(), meterBoxNumber)) return false;
@@ -358,6 +362,8 @@ public class LvDataServiceImpl implements LvDataService {
         meterData.setCustomerType(meter.customerType());
         meterData.setEstimatedLoad(meter.estimatedLoad());
         meterData.setMeterType(meter.meterType());
+        meterData.setMeterBreakerSize(meter.meterBreakerSize());
+        meterData.setCustomerSideBreakerSize(meter.customerSideBreakerSize());
         meterData.setServiceCableLength(meter.serviceCableLength());
         meterData.setServiceCableType(meter.serviceCableType());
         meterData.setPoleData(poleData);

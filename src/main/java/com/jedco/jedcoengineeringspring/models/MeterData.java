@@ -56,6 +56,13 @@ public class MeterData extends BaseEntity {
     @Column(name="box_assembly_type", length=100)
     private String boxAssemblyType;
 
+    @Column(name="meter_breaker_size", length = 100)
+    private String meterBreakerSize;
+
+    @Column(name="customer_side_breaker_size", length = 100)
+    private String customerSideBreakerSize;
+
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="registered_on", length=23)
     private Date registeredOn;
